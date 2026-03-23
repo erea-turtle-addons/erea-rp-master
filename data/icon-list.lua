@@ -4,7 +4,7 @@
 -- PURPOSE: Provides searchable icon list for RPMaster icon picker dialog
 --
 -- USAGE:
---   local iconList = RPMaster_GetIconList()
+--   local iconList = EreaRpMaster_GetIconList()
 --   for i = 1, table.getn(iconList) do
 --     local iconPath = iconList[i]  -- "Interface\\Icons\\INV_Misc_Note_01"
 --   end
@@ -1451,6 +1451,6 @@ local iconList = {
 
 -- Get complete icon list
 -- @returns: table - Array of icon paths (1420 entries)
-function RPMaster_GetIconList()
+function EreaRpMaster_GetIconList()
     return iconList
 end
