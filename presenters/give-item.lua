@@ -161,7 +161,7 @@ function EreaRpMasterGiveItemFrame:Open(committedItem)
 
     -- Pre-fill fields from item defaults
     self.messageEditBox:SetText(committedItem.defaultHandoutText or "")
-    self.customTextEditBox:SetText("")
+    self.customTextEditBox:SetText(committedItem.initialCustomText or "")
     self.additionalTextEditBox:SetText("")
     self.counterEditBox:SetText(tostring(committedItem.initialCounter or 0))
 
