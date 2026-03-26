@@ -47,6 +47,7 @@ local function HandleGiveReject(sender, parts)
     local itemName = parts[2] or "unknown item"
 
     Log("GIVE_REJECT from " .. sender .. " for '" .. itemName .. "'")
+    DEFAULT_CHAT_FRAME:AddMessage("|cFFFFD700[RP Master]|r " .. sender .. " refused the item |cFFFFFFFF" .. itemName .. "|r.")
 end
 
 -- CINEMATIC_TRIGGER: parts = [type, cinematicGuid, customText, additionalText, customNumber] — sender from arg4

@@ -80,7 +80,7 @@
   </Button>
 
   <Frame name="EreaRpMasterActionEditorFrame" parent="UIParent"
-         enableMouse="true" hidden="true">
+         frameStrata="DIALOG" hidden="true">
 
     <Layers>
       <Layer level="OVERLAY">

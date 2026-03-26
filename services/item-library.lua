@@ -295,20 +295,48 @@ function EreaRpMasterItemLibrary:IsItemUncommitted(item)
         if (item.recipe.notifyGm or false) ~= (committedItem.recipe.notifyGm or false) then return true end
     end
 
-    -- Compare actions count
-    local itemActionsCount = 0
-    if item.actions then
-        for _ in pairs(item.actions) do
-            itemActionsCount = itemActionsCount + 1
-        end
-    end
-    local committedActionsCount = 0
-    if committedItem.actions then
-        for _ in pairs(committedItem.actions) do
-            committedActionsCount = committedActionsCount + 1
-        end
-    end
+    -- Compare actions (count + content)
+    local itemActionsCount = item.actions and table.getn(item.actions) or 0
+    local committedActionsCount = committedItem.actions and table.getn(committedItem.actions) or 0
     if itemActionsCount ~= committedActionsCount then return true end
+
+    -- Compare each action's fields
+    for i = 1, itemActionsCount do
+        local a  = item.actions[i]
+        local ca = committedItem.actions[i]
+        if not ca then return true end
+        if (a.id or "") ~= (ca.id or "") then return true end
+        if (a.label or "") ~= (ca.label or "") then return true end
+        if (a.sendStatus or false) ~= (ca.sendStatus or false) then return true end
+
+        -- Compare conditions
+        local ac  = a.conditions  or {}
+        local cac = ca.conditions or {}
+        if (ac.customTextEmpty        and true or false) ~= (cac.customTextEmpty        and true or false) then return true end
+        if (ac.counterGreaterThanZero and true or false) ~= (cac.counterGreaterThanZero and true or false) then return true end
+
+        -- Compare methods count
+        local mCount  = a.methods  and table.getn(a.methods)  or 0
+        local cmCount = ca.methods and table.getn(ca.methods) or 0
+        if mCount ~= cmCount then return true end
+
+        -- Compare each method
+        for j = 1, mCount do
+            local m  = a.methods[j]
+            local cm = ca.methods[j]
+            if not cm then return true end
+            if (m.type or "") ~= (cm.type or "") then return true end
+            -- Compare params
+            local mp  = m.params  or {}
+            local cmp = cm.params or {}
+            for key, val in pairs(mp) do
+                if cmp[key] ~= val then return true end
+            end
+            for key, val in pairs(cmp) do
+                if mp[key] ~= val then return true end
+            end
+        end
+    end
 
     return false
 end
