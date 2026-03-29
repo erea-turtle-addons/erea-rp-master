@@ -169,8 +169,7 @@ function EreaRpMasterItemEditorFrame:Initialize()
             notCheckable = 1
         })
         local items = EreaRpMasterDB and EreaRpMasterDB.itemLibrary or {}
-        for i = 1, table.getn(items) do -- Lua 5.0: table.getn
-            local item     = items[i]
+        for _, item in pairs(items) do
             local itemGuid = item.guid
             local itemName = item.name
             UIDropDownMenu_AddButton({
@@ -198,8 +197,7 @@ function EreaRpMasterItemEditorFrame:Initialize()
             notCheckable = 1
         })
         local items = EreaRpMasterDB and EreaRpMasterDB.itemLibrary or {}
-        for i = 1, table.getn(items) do -- Lua 5.0: table.getn
-            local item     = items[i]
+        for _, item in pairs(items) do
             local itemGuid = item.guid
             local itemName = item.name
             UIDropDownMenu_AddButton({
