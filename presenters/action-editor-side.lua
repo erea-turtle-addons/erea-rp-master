@@ -6,14 +6,29 @@
 --          (None/Portrait/Animation) with sub-fields for portrait unit or
 --          animation selection, plus a live VideoPlayer preview.
 --
+-- VERTICAL LAYOUT (UIDropDownMenuTemplate frame height ≈ 44px):
+--
+--   yOffset - 5:   header label
+--   yOffset - 20:  type dropdown   (frame: yOffset-20 to yOffset-64)
+--   yOffset - 66:  sub-label       (2px gap below type dropdown frame)
+--   yOffset - 81:  sub-dropdown    (frame: yOffset-81 to yOffset-125)
+--                  [preview to the right of anim sub-dropdown]
+--   yOffset - 132: loop label      (7px gap below sub-dropdown frame)
+--   yOffset - 147: loop dropdown   (frame: yOffset-147 to yOffset-191)
+--
+--   Total height consumed: 200px
+--
 -- INTERFACE:
---   EreaRpMasterSideEditor.Create(parent, sideLabel, xOffset, yOffset) -> side, height
+--   EreaRpMasterSideEditor.Create(parent, sideLabel, yOffset) -> side, height
 --   side:GetType()          -> "none"|"portrait"|"animation"
 --   side:GetPortraitUnit()  -> "player"|"target"
 --   side:GetAnimationKey()  -> string
+--   side:GetLoopMode()      -> "pingpong"|"cycle"
 --   side:SetType(val)
 --   side:SetPortraitUnit(val)
 --   side:SetAnimationKey(val)
+--   side:SetLoopMode(val)
+--   side.Reposition(newXOffset, newColumnWidth)
 -- ============================================================================
 
 EreaRpMasterSideEditor = {}
@@ -28,78 +43,59 @@ local previewCounter = 0
 -- @param sideLabel:  "Left" or "Right"
 -- @param xOffset:    Horizontal offset within parent (column position)
 -- @param yOffset:    Y offset within parent
--- @returns: sideEditor table, totalHeight consumed (100)
+-- @returns: sideEditor table, totalHeight consumed (200)
 -- ============================================================================
-function EreaRpMasterSideEditor.Create(parent, sideLabel, xOffset, yOffset)
+function EreaRpMasterSideEditor.Create(parent, sideLabel, yOffset)
     local side = {}
 
     local cinematicAnims = EreaRpLibraries:CinematicAnimations()
     local videoPlayerLib = EreaRpLibraries:VideoPlayer()
 
-    -- Section header
+    -- ── Create frames and fontstrings (no positions — set by Reposition below) ─
+
     local header = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    header:SetPoint("TOPLEFT", xOffset + 10, yOffset)
     header:SetText("|cFFFFD700" .. sideLabel .. " side:|r")
 
-    -- Type dropdown: [None, Portrait, Animation]
     dropdownCounter = dropdownCounter + 1
-    local typeDropdownName = "EreaRpMasterSideEditorType" .. dropdownCounter
-    local typeDropdown = CreateFrame("Frame", typeDropdownName, parent, "UIDropDownMenuTemplate")
-    typeDropdown:SetPoint("TOPLEFT", xOffset, yOffset - 18)
-    UIDropDownMenu_SetWidth(100, typeDropdown)  -- Lua 5.0: WoW 1.12 arg order is (width, dropdown)
+    local typeDropdown = CreateFrame("Frame", "EreaRpMasterSideEditorType" .. dropdownCounter, parent, "UIDropDownMenuTemplate")
 
-    -- Portrait unit dropdown: [Player (sender), Target (sender's target)]
     dropdownCounter = dropdownCounter + 1
-    local unitDropdownName = "EreaRpMasterSideEditorUnit" .. dropdownCounter
-    local unitDropdown = CreateFrame("Frame", unitDropdownName, parent, "UIDropDownMenuTemplate")
-    unitDropdown:SetPoint("TOPLEFT", xOffset, yOffset - 58)
-    UIDropDownMenu_SetWidth(95, unitDropdown)  -- Lua 5.0: WoW 1.12 arg order is (width, dropdown)
+    local unitDropdown = CreateFrame("Frame", "EreaRpMasterSideEditorUnit" .. dropdownCounter, parent, "UIDropDownMenuTemplate")
     unitDropdown:Hide()
 
     local unitLabel = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    unitLabel:SetPoint("TOPLEFT", xOffset + 10, yOffset - 42)
     unitLabel:SetText("Portrait unit:")
     unitLabel:Hide()
 
-    -- Animation dropdown
     dropdownCounter = dropdownCounter + 1
-    local animDropdownName = "EreaRpMasterSideEditorAnim" .. dropdownCounter
-    local animDropdown = CreateFrame("Frame", animDropdownName, parent, "UIDropDownMenuTemplate")
-    animDropdown:SetPoint("TOPLEFT", xOffset, yOffset - 58)
-    UIDropDownMenu_SetWidth(72, animDropdown)  -- Lua 5.0: WoW 1.12 arg order is (width, dropdown)
+    local animDropdown = CreateFrame("Frame", "EreaRpMasterSideEditorAnim" .. dropdownCounter, parent, "UIDropDownMenuTemplate")
     animDropdown:Hide()
 
     local animLabel = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    animLabel:SetPoint("TOPLEFT", xOffset + 10, yOffset - 42)
     animLabel:SetText("Animation:")
     animLabel:Hide()
 
-    -- Loop mode dropdown: [Ping-Pong, Cycle] — only visible for animation type
     dropdownCounter = dropdownCounter + 1
-    local loopModeDropdownName = "EreaRpMasterSideEditorLoopMode" .. dropdownCounter
-    local loopModeDropdown = CreateFrame("Frame", loopModeDropdownName, parent, "UIDropDownMenuTemplate")
-    loopModeDropdown:SetPoint("TOPLEFT", xOffset, yOffset - 96)
-    UIDropDownMenu_SetWidth(72, loopModeDropdown)
+    local loopModeDropdown = CreateFrame("Frame", "EreaRpMasterSideEditorLoopMode" .. dropdownCounter, parent, "UIDropDownMenuTemplate")
     loopModeDropdown:Hide()
 
     local loopModeLabel = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    loopModeLabel:SetPoint("TOPLEFT", xOffset + 10, yOffset - 80)
     loopModeLabel:SetText("Loop:")
     loopModeLabel:Hide()
 
-    -- Live preview: 36x36 frame with VideoPlayer, to the right of the animation dropdown
     previewCounter = previewCounter + 1
-    local previewFrameName = "EreaRpMasterSideEditorPreview" .. previewCounter
-    local previewFrame = CreateFrame("Frame", previewFrameName, parent)
-    previewFrame:SetWidth(36)
-    previewFrame:SetHeight(36)
-    previewFrame:SetPoint("LEFT", animDropdown, "RIGHT", 5, 0)
+    local previewFrame = CreateFrame("Frame", "EreaRpMasterSideEditorPreview" .. previewCounter, parent)
+    previewFrame:SetWidth(72)
+    previewFrame:SetHeight(72)
+    previewFrame:SetPoint("TOPRIGHT",  animDropdown,    "TOPRIGHT",  61, -3)
     previewFrame:Hide()
 
     local previewTexture = previewFrame:CreateTexture(nil, "ARTWORK")
     previewTexture:SetAllPoints(previewFrame)
 
     local previewPlayer = videoPlayerLib.New(previewTexture)
+
+    -- ── Helpers ────────────────────────────────────────────────────────────────
 
     local function SetPreviewAnimation(animKey, loopMode)
         previewPlayer:Stop()
@@ -115,7 +111,6 @@ function EreaRpMasterSideEditor.Create(parent, sideLabel, xOffset, yOffset)
         end
     end
 
-    -- Helper: show/hide sub-fields based on type
     local function UpdateSubFields(selectedType)
         if selectedType == "portrait" then
             unitDropdown:Show()
@@ -133,7 +128,6 @@ function EreaRpMasterSideEditor.Create(parent, sideLabel, xOffset, yOffset)
             animLabel:Show()
             loopModeDropdown:Show()
             loopModeLabel:Show()
-            -- Restore preview if an animation is selected
             local currentAnim = UIDropDownMenu_GetSelectedValue(animDropdown) or ""
             local currentLoopMode = UIDropDownMenu_GetSelectedValue(loopModeDropdown) or "pingpong"
             SetPreviewAnimation(currentAnim, currentLoopMode)
@@ -149,11 +143,12 @@ function EreaRpMasterSideEditor.Create(parent, sideLabel, xOffset, yOffset)
         end
     end
 
-    -- Initialize type dropdown
+    -- ── Dropdown initialization ────────────────────────────────────────────────
+
     UIDropDownMenu_Initialize(typeDropdown, function()
         local types = {
-            { text = "None", value = "none" },
-            { text = "Portrait", value = "portrait" },
+            { text = "None",      value = "none" },
+            { text = "Portrait",  value = "portrait" },
             { text = "Animation", value = "animation" }
         }
         for i = 1, table.getn(types) do -- Lua 5.0: table.getn
@@ -176,10 +171,9 @@ function EreaRpMasterSideEditor.Create(parent, sideLabel, xOffset, yOffset)
     UIDropDownMenu_SetSelectedValue(typeDropdown, "none")
     UIDropDownMenu_SetText("None", typeDropdown)
 
-    -- Initialize unit dropdown
     UIDropDownMenu_Initialize(unitDropdown, function()
         local units = {
-            { text = "Player (sender)", value = "player" },
+            { text = "Player (sender)",          value = "player" },
             { text = "Target (sender's target)", value = "target" }
         }
         for i = 1, table.getn(units) do -- Lua 5.0: table.getn
@@ -201,7 +195,6 @@ function EreaRpMasterSideEditor.Create(parent, sideLabel, xOffset, yOffset)
     UIDropDownMenu_SetSelectedValue(unitDropdown, "player")
     UIDropDownMenu_SetText("Player (sender)", unitDropdown)
 
-    -- Initialize animation dropdown
     UIDropDownMenu_Initialize(animDropdown, function()
         local noneInfo = {}
         noneInfo.text = "(None)"
@@ -234,7 +227,6 @@ function EreaRpMasterSideEditor.Create(parent, sideLabel, xOffset, yOffset)
     end)
     UIDropDownMenu_SetText("(None)", animDropdown)
 
-    -- Initialize loop mode dropdown
     UIDropDownMenu_Initialize(loopModeDropdown, function()
         local modes = {
             { text = "Ping-Pong", value = "pingpong" },
@@ -261,7 +253,8 @@ function EreaRpMasterSideEditor.Create(parent, sideLabel, xOffset, yOffset)
     UIDropDownMenu_SetSelectedValue(loopModeDropdown, "pingpong")
     UIDropDownMenu_SetText("Ping-Pong", loopModeDropdown)
 
-    -- Getters/setters
+    -- ── Getters / Setters ──────────────────────────────────────────────────────
+
     function side:GetType()
         return UIDropDownMenu_GetSelectedValue(typeDropdown) or "none"
     end
@@ -306,8 +299,6 @@ function EreaRpMasterSideEditor.Create(parent, sideLabel, xOffset, yOffset)
         else
             UIDropDownMenu_SetText("(None)", animDropdown)
         end
-        -- Only update live preview when animation type is active;
-        -- avoids showing stale animation keys stored alongside a portrait/none type
         if side:GetType() == "animation" then
             local currentLoopMode = UIDropDownMenu_GetSelectedValue(loopModeDropdown) or "pingpong"
             SetPreviewAnimation(val, currentLoopMode)
@@ -328,45 +319,44 @@ function EreaRpMasterSideEditor.Create(parent, sideLabel, xOffset, yOffset)
         end
     end
 
-    -- Reposition all elements to a new horizontal offset within the parent frame.
-    -- newColumnWidth (optional) resizes dropdowns proportionally to available space.
+    -- ── Reposition: single source of truth for all element positions ───────────
+    -- Called on creation and whenever the parent frame is resized (via Reflow).
+    --   typeDdWidth: fills the column (no preview beside type/unit dropdown)
+    --   animDdWidth: leaves room for 36px preview + 5px gap + 32px frame padding
     function side.Reposition(newXOffset, newColumnWidth)
         header:ClearAllPoints()
-        header:SetPoint("TOPLEFT", newXOffset + 10, yOffset)
+        header:SetPoint("TOPLEFT", newXOffset + 20, yOffset - 5)
 
         typeDropdown:ClearAllPoints()
-        typeDropdown:SetPoint("TOPLEFT", newXOffset, yOffset - 18)
-
-        unitDropdown:ClearAllPoints()
-        unitDropdown:SetPoint("TOPLEFT", newXOffset, yOffset - 58)
+        typeDropdown:SetPoint("TOPLEFT", newXOffset, yOffset - 20)
 
         unitLabel:ClearAllPoints()
-        unitLabel:SetPoint("TOPLEFT", newXOffset + 10, yOffset - 42)
+        unitLabel:SetPoint("TOPLEFT", newXOffset + 20, yOffset - 56)
 
-        animDropdown:ClearAllPoints()
-        animDropdown:SetPoint("TOPLEFT", newXOffset, yOffset - 58)
+        unitDropdown:ClearAllPoints()
+        unitDropdown:SetPoint("TOPLEFT", newXOffset, yOffset - 71)
 
         animLabel:ClearAllPoints()
-        animLabel:SetPoint("TOPLEFT", newXOffset + 10, yOffset - 42)
+        animLabel:SetPoint("TOPLEFT", newXOffset + 20, yOffset - 56)
+
+        animDropdown:ClearAllPoints()
+        animDropdown:SetPoint("TOPLEFT", newXOffset, yOffset - 71)
 
         loopModeLabel:ClearAllPoints()
-        loopModeLabel:SetPoint("TOPLEFT", newXOffset + 10, yOffset - 80)
+        loopModeLabel:SetPoint("TOPLEFT", newXOffset + 20, yOffset - 106)
 
         loopModeDropdown:ClearAllPoints()
-        loopModeDropdown:SetPoint("TOPLEFT", newXOffset, yOffset - 96)
+        loopModeDropdown:SetPoint("TOPLEFT", newXOffset, yOffset - 121)
 
-        -- Preview is anchored relative to animDropdown, moves automatically.
+        -- previewFrame is anchored to animDropdown:RIGHT — moves automatically.
 
-        if newColumnWidth then
-            local typeDdWidth = math.min(160, math.max(80, newColumnWidth - 40))
-            local animDdWidth = math.min(120, math.max(60, newColumnWidth - 65))
-            UIDropDownMenu_SetWidth(typeDdWidth, typeDropdown)
-            UIDropDownMenu_SetWidth(typeDdWidth, unitDropdown)
-            UIDropDownMenu_SetWidth(animDdWidth, animDropdown)
-            UIDropDownMenu_SetWidth(animDdWidth, loopModeDropdown)
-        end
+        local typeDdWidth = math.max(80, (newColumnWidth or 160) - 32)
+        local animDdWidth = math.max(60, (newColumnWidth or 160) - 112)
+        UIDropDownMenu_SetWidth(typeDdWidth, typeDropdown)
+        UIDropDownMenu_SetWidth(typeDdWidth, unitDropdown)
+        UIDropDownMenu_SetWidth(animDdWidth, animDropdown)
+        UIDropDownMenu_SetWidth(animDdWidth, loopModeDropdown)
     end
 
-    -- Total height consumed: header (18) + type dropdown (40) + anim sub-field (40) + loop mode (40)
-    return side, 140
+    return side, 153
 end

@@ -29,7 +29,7 @@
         <FontString name="$parentTitle" inherits="GameFontNormal">
           <Anchors>
             <Anchor point="TOPLEFT">
-              <Offset><AbsDimension x="5" y="-5"/></Offset>
+              <Offset><AbsDimension x="7" y="-7"/></Offset>
             </Anchor>
           </Anchors>
         </FontString>

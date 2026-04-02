@@ -24,7 +24,7 @@ local counter = 0
 function EreaRpMasterAddTextEditor.Create(parent, params, methodIndex)
     counter = counter + 1
     local frame = CreateFrame("Frame", "EreaRpMasterAddTextEditor" .. counter, parent, "EreaRpMasterAddTextEditorTemplate")
-    frame:SetWidth(parent:GetWidth() - 10)
+    frame:SetWidth(parent:GetWidth() - 20)
 
     -- Set method title
     local title = _G[frame:GetName() .. "Title"]

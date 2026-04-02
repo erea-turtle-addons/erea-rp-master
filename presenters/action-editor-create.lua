@@ -27,11 +27,20 @@ local dropdownCounter = 0
 function EreaRpMasterCreateEditor.Create(parent, params, methodIndex)
     counter = counter + 1
     local frame = CreateFrame("Frame", "EreaRpMasterCreateEditor" .. counter, parent, "EreaRpMasterCreateEditorTemplate")
-    frame:SetWidth(parent:GetWidth() - 10)
+    frame:SetWidth(parent:GetWidth() - 20)
 
     -- Set method title
     local title = _G[frame:GetName() .. "Title"]
     title:SetText("|cFFFFD700Method " .. methodIndex .. ":|r Create Object")
+
+    -- Set label texts via Lua (WoW 1.12: <Text> in virtual templates is not applied)
+    _G[frame:GetName() .. "ObjectLabel"]:SetText("Object to create:")
+    _G[frame:GetName() .. "CustomTextLabel"]:SetText("Custom text for new object:")
+    _G[frame:GetName() .. "CustomTextHint"]:SetText("|cFF888888(Use {custom-text} to copy source item's text)|r")
+    _G[frame:GetName() .. "AdditionalTextLabel"]:SetText("Additional text for new object:")
+    _G[frame:GetName() .. "AdditionalTextHint"]:SetText("|cFF888888(Use {additional-text} to copy source item's additional text)|r")
+    _G[frame:GetName() .. "CustomNumberLabel"]:SetText("Counter for new object:")
+    _G[frame:GetName() .. "CustomNumberHint"]:SetText("|cFF888888(Use {item-counter} to copy source item's counter)|r")
 
     -- Get child references
     local customTextEdit = _G[frame:GetName() .. "CustomTextEdit"]
@@ -39,10 +48,11 @@ function EreaRpMasterCreateEditor.Create(parent, params, methodIndex)
     local customNumberEdit = _G[frame:GetName() .. "CustomNumberEdit"]
 
     -- Initialize object dropdown (UIDropDownMenuTemplate needs unique global name)
+    -- Positioned at y=-52 so its visual texture (extends 24px above anchor) clears the label at y=-30
     dropdownCounter = dropdownCounter + 1
     local dropdownName = "EreaRpMasterCreateEditorDropdown" .. dropdownCounter
     local objectDropdown = CreateFrame("Frame", dropdownName, frame, "UIDropDownMenuTemplate")
-    objectDropdown:SetPoint("TOPLEFT", 0, -48)
+    objectDropdown:SetPoint("TOPLEFT", -12, -52)
     UIDropDownMenu_SetWidth(320, objectDropdown)
 
     UIDropDownMenu_Initialize(objectDropdown, function()

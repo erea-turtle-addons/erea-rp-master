@@ -688,12 +688,12 @@ function EreaRpMasterActionEditorFrame:RefreshMethodsList()
     if not action or not action.methods then return end
 
     -- Create new method frames
-    local yOffset = -5
+    local yOffset = 0
     for i = 1, table.getn(action.methods) do -- Lua 5.0: no # operator
         local methodFrame = CreateMethodFrame(self.methodsScrollChild, action.methods, i)
         if methodFrame then
-            methodFrame:SetPoint("TOPLEFT", 5, yOffset)
-            yOffset = yOffset - methodFrame:GetHeight() - 5
+            methodFrame:SetPoint("TOPLEFT", 0, yOffset)
+            yOffset = yOffset - methodFrame:GetHeight() - 4
             table.insert(self.methodFrames, methodFrame)
         end
     end

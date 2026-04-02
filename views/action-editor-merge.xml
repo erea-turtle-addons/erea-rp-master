@@ -31,39 +31,37 @@
         <FontString name="$parentTitle" inherits="GameFontNormal">
           <Anchors>
             <Anchor point="TOPLEFT">
-              <Offset><AbsDimension x="5" y="-5"/></Offset>
+              <Offset><AbsDimension x="7" y="-7"/></Offset>
             </Anchor>
           </Anchors>
         </FontString>
-        <FontString name="$parentGroupLabel" inherits="GameFontNormalSmall">
-          <Anchors>
-            <Anchor point="TOPLEFT">
-              <Offset><AbsDimension x="10" y="-30"/></Offset>
-            </Anchor>
-          </Anchors>
-          <Text>Merge Group:</Text>
-        </FontString>
+        <!-- Row 2: Group ID + Invocation threshold on one line at y=-44 -->
+        <!-- NOTE: Text set via Lua SetText — WoW 1.12 does not render <Text> on virtual template FontStrings -->
         <FontString name="$parentIdLabel" inherits="GameFontNormalSmall">
           <Anchors>
             <Anchor point="TOPLEFT">
-              <Offset><AbsDimension x="20" y="-80"/></Offset>
+              <Offset><AbsDimension x="7" y="-64"/></Offset>
             </Anchor>
           </Anchors>
-          <Text>Group ID:</Text>
         </FontString>
-        <!-- Amount and Description labels are positioned dynamically in Lua
-             since they follow the cinematic component which has variable height -->
+        <FontString name="$parentAmountLabel" inherits="GameFontNormalSmall">
+          <Anchors>
+            <Anchor point="TOPLEFT">
+              <Offset><AbsDimension x="380" y="-64"/></Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
       </Layer>
     </Layers>
     <Frames>
-      <!-- Group selection dropdown created in Lua -->
+      <!-- Group selection dropdown created in Lua (UIDropDownMenuTemplate requires CreateFrame) -->
       <EditBox name="$parentIdEdit" inherits="InputBoxTemplate" autoFocus="false">
         <Size>
-          <AbsDimension x="320" y="25"/>
+          <AbsDimension x="275" y="25"/>
         </Size>
         <Anchors>
           <Anchor point="TOPLEFT">
-            <Offset><AbsDimension x="20" y="-98"/></Offset>
+            <Offset><AbsDimension x="73" y="-55"/></Offset>
           </Anchor>
         </Anchors>
         <Scripts>
@@ -72,8 +70,22 @@
           </OnEscapePressed>
         </Scripts>
       </EditBox>
-      <!-- Cinematic component, amount, description, and save button
-           are all created dynamically in Lua -->
+      <EditBox name="$parentAmountEdit" inherits="InputBoxTemplate" autoFocus="false">
+        <Size>
+          <AbsDimension x="50" y="25"/>
+        </Size>
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset><AbsDimension x="495" y="-55"/></Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnEscapePressed>
+            this:ClearFocus()
+          </OnEscapePressed>
+        </Scripts>
+      </EditBox>
+      <!-- Cinematic component is created dynamically in Lua below the header -->
     </Frames>
   </Frame>
 

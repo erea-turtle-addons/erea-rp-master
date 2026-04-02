@@ -15,7 +15,7 @@
         <Size><AbsDimension x="60" y="20"/></Size>
         <Anchors>
           <Anchor point="TOPRIGHT">
-            <Offset><AbsDimension x="-5" y="-2"/></Offset>
+            <Offset><AbsDimension x="-5" y="-4"/></Offset>
           </Anchor>
         </Anchors>
       </Button>
@@ -24,7 +24,7 @@
         <Size><AbsDimension x="25" y="20"/></Size>
         <Anchors>
           <Anchor point="TOPRIGHT">
-            <Offset><AbsDimension x="-70" y="-2"/></Offset>
+            <Offset><AbsDimension x="-70" y="-4"/></Offset>
           </Anchor>
         </Anchors>
       </Button>
@@ -33,7 +33,7 @@
         <Size><AbsDimension x="25" y="20"/></Size>
         <Anchors>
           <Anchor point="TOPRIGHT">
-            <Offset><AbsDimension x="-100" y="-2"/></Offset>
+            <Offset><AbsDimension x="-100" y="-4"/></Offset>
           </Anchor>
         </Anchors>
       </Button>
@@ -303,14 +303,14 @@
         </Anchors>
       </CheckButton>
 
-      <!-- Methods scroll frame -->
-      <ScrollFrame name="$parentMethodsScroll" enableMouse="true">
+      <!-- Methods border container (visual border only; scroll frame is inset inside) -->
+      <Frame name="$parentMethodsBorder">
         <Anchors>
           <Anchor point="TOPLEFT">
             <Offset><AbsDimension x="220" y="-125"/></Offset>
           </Anchor>
           <Anchor point="BOTTOMRIGHT">
-            <Offset><AbsDimension x="-40" y="40"/></Offset>
+            <Offset><AbsDimension x="-20" y="40"/></Offset>
           </Anchor>
         </Anchors>
         <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground"
@@ -325,26 +325,38 @@
             this:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
           </OnLoad>
         </Scripts>
+      </Frame>
+
+      <!-- Methods scroll frame: inset inside the border (10px top/left/bottom, 26px right for scrollbar) -->
+      <ScrollFrame name="$parentMethodsScroll" enableMouse="true">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentMethodsBorder" relativePoint="TOPLEFT">
+            <Offset><AbsDimension x="10" y="-10"/></Offset>
+          </Anchor>
+          <Anchor point="BOTTOMRIGHT" relativeTo="$parentMethodsBorder" relativePoint="BOTTOMRIGHT">
+            <Offset><AbsDimension x="-26" y="10"/></Offset>
+          </Anchor>
+        </Anchors>
         <Frames>
           <Frame name="EreaRpMasterActionEditorFrameMethodsScrollChild">
             <Size>
-              <AbsDimension x="530" y="1"/>
+              <AbsDimension x="570" y="1"/>
             </Size>
           </Frame>
         </Frames>
       </ScrollFrame>
 
-      <!-- Methods scrollbar -->
+      <!-- Methods scrollbar: inside the border container, on the right -->
       <Slider name="$parentMethodsSlider" inherits="UIPanelScrollBarTemplate">
         <Size>
           <AbsDimension x="16" y="0"/>
         </Size>
         <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="$parentMethodsScroll" relativePoint="TOPRIGHT">
-            <Offset><AbsDimension x="4" y="-16"/></Offset>
+          <Anchor point="TOPRIGHT" relativeTo="$parentMethodsBorder" relativePoint="TOPRIGHT">
+            <Offset><AbsDimension x="-10" y="-26"/></Offset>
           </Anchor>
-          <Anchor point="BOTTOMLEFT" relativeTo="$parentMethodsScroll" relativePoint="BOTTOMRIGHT">
-            <Offset><AbsDimension x="4" y="16"/></Offset>
+          <Anchor point="BOTTOMRIGHT" relativeTo="$parentMethodsBorder" relativePoint="BOTTOMRIGHT">
+            <Offset><AbsDimension x="-10" y="26"/></Offset>
           </Anchor>
         </Anchors>
       </Slider>
