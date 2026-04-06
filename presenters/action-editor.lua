@@ -45,6 +45,8 @@ local EDITOR_MAP = {
     ConsumeCharge = EreaRpMasterConsumeEditor,
     DisplayCinematic = EreaRpMasterDisplayEditor,
     MergeCinematic = EreaRpMasterMergeEditor,
+    NpcChat = EreaRpMasterNpcChatEditor,
+    WhisperPlayer = EreaRpMasterWhisperEditor,
 }
 
 -- ============================================================================

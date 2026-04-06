@@ -29,6 +29,7 @@ EreaRpMasterEventHandler = {}
 -- IMPORTS
 -- ============================================================================
 local messaging = EreaRpLibraries:Messaging()
+local encoding  = EreaRpLibraries:Encoding()
 local Log = EreaRpLibraries:Logging("EreaRpMaster")
 
 -- ============================================================================
@@ -123,8 +124,14 @@ function EreaRpMasterEventHandler:Initialize()
 
     local eventFrame = CreateFrame("Frame")
     eventFrame:RegisterEvent("CHAT_MSG_ADDON")
+    eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
     eventFrame:SetScript("OnEvent", function()
         -- Lua 5.0: event, arg1..arg4 are globals
+        if event == "PLAYER_ENTERING_WORLD" then
+            EreaRpMasterNpcLibrary:MarkAllOffline()
+            return
+        end
+
         if event ~= "CHAT_MSG_ADDON" then return end
 
         local prefix  = arg1
@@ -149,6 +156,22 @@ function EreaRpMasterEventHandler:Initialize()
 
         elseif msgType == messaging.MESSAGE_TYPES.STATUS_RESPONSE then
             EreaRpMasterPlayerMonitorFrame:HandleStatusResponse(sender, parts)
+
+            -- NPC detection: parts[8] is "NPC" or "PC" (optional, backward compat)
+            local charType = parts[8] or ""
+            if charType == "NPC" then
+                EreaRpMasterNpcLibrary:RegisterNpc(sender, true)
+            else
+                -- Known NPC toon online but NPC addon not active
+                if EreaRpMasterNpcLibrary:GetNpc(sender) then
+                    EreaRpMasterNpcLibrary:MarkOnlineWithoutAddon(sender)
+                end
+            end
+
+            -- Refresh NPC panel if visible
+            if EreaRpMasterNpcPanelFrame:IsShown() then
+                EreaRpMasterNpcPanelFrame:RefreshList()
+            end
 
         elseif msgType == messaging.MESSAGE_TYPES.MERGE_TRIGGER then
             -- Format: MERGE_TRIGGER^mergeGroupId^objectGuid^customNumber
@@ -190,6 +213,48 @@ function EreaRpMasterEventHandler:Initialize()
             -- Refresh player row if monitor is visible
             if EreaRpMasterPlayerMonitorFrame:IsShown() then
                 EreaRpMasterPlayerMonitorFrame:RefreshPlayerRow(sender)
+            end
+
+        elseif msgType == messaging.MESSAGE_TYPES.NPC_CHAT_RELAY then
+            -- Format: NPC_CHAT_RELAY^chatType^senderName^messageText
+            local chatType    = parts[2] or ""
+            local speakerName = parts[3] or ""
+            local messageText = parts[4] or ""
+            -- Forward to NPC panel history (sender = NPC character relaying)
+            EreaRpMasterNpcPanelFrame:AddRelayedChat(sender, chatType, speakerName, messageText)
+
+        elseif msgType == messaging.MESSAGE_TYPES.NPC_ACTION_TRIGGER then
+            -- Format: NPC_ACTION_TRIGGER^tag^cmdType^text
+            local tag     = parts[2] or ""
+            local cmdType = parts[3] or ""
+            local text    = parts[4] or ""
+            Log("NPC_ACTION_TRIGGER from " .. tostring(sender) .. " tag=" .. tag .. " cmdType=" .. cmdType)
+
+            if tag == "" or cmdType == "" or text == "" then
+                Log("NPC_ACTION_TRIGGER: missing fields, ignoring")
+            else
+                local npcs = EreaRpMasterNpcLibrary:GetOnlineNpcsByTag(tag)
+                local npcCount = table.getn(npcs)  -- Lua 5.0: no # operator
+                if npcCount == 0 then
+                    Log("NPC_ACTION_TRIGGER: no online NPCs with tag '" .. tag .. "'")
+                else
+                    for i = 1, npcCount do
+                        messaging.SendNpcCmdRangedMessage(npcs[i].name, cmdType, text, sender)
+                    end
+                    Log("NPC_ACTION_TRIGGER: sent NPC_CMD_RANGED to " .. npcCount .. " NPC(s)")
+                end
+            end
+
+        elseif msgType == messaging.MESSAGE_TYPES.WHISPER_TRIGGER then
+            -- Format: WHISPER_TRIGGER^text (Base64 decoded by ParseMessage)
+            local text = parts[2] or ""
+            Log("WHISPER_TRIGGER from " .. tostring(sender) .. " text=" .. text)
+
+            if text ~= "" then
+                SendChatMessage(text, "WHISPER", nil, sender)
+                Log("WHISPER_TRIGGER: whispered to " .. sender)
+            else
+                Log("WHISPER_TRIGGER: empty text, ignoring")
             end
         end
     end)

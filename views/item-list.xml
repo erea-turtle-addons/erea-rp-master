@@ -11,10 +11,14 @@
       <!-- Scroll frame (middle area) -->
       <ScrollFrame name="EreaRpMasterItemListScrollFrame" inherits="UIPanelScrollFrameTemplate">
         <Anchors>
-          <Anchor point="TOPLEFT"/>
+          <Anchor point="TOPLEFT">
+            <Offset>
+              <AbsDimension x="0" y="-5"/>
+            </Offset>
+          </Anchor>
           <Anchor point="BOTTOMRIGHT">
             <Offset>
-              <AbsDimension x="-22" y="54"/>
+              <AbsDimension x="-27" y="54"/>
             </Offset>
           </Anchor>
         </Anchors>

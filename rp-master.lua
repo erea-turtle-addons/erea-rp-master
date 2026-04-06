@@ -69,6 +69,26 @@ local function InitializeDB()
         EreaRpMasterDB.scriptLibrary = {}
     end
 
+    -- Ensure NPC library exists (backward compatibility)
+    if not EreaRpMasterDB.npcLibrary then
+        EreaRpMasterDB.npcLibrary = {}
+    end
+
+    -- Ensure all NPC entries have a tags field (backward compatibility)
+    for _, entry in pairs(EreaRpMasterDB.npcLibrary) do
+        if not entry.tags then
+            entry.tags = {}
+        end
+    end
+
+    -- Ensure events library exists (backward compatibility)
+    if not EreaRpMasterDB.events then
+        EreaRpMasterDB.events = {}
+    end
+    if not EreaRpMasterDB.activeEventId then
+        EreaRpMasterDB.activeEventId = nil
+    end
+
     -- Ensure preferences structure exists (backward compatibility)
     if not EreaRpMasterDB.preferences then
         EreaRpMasterDB.preferences = {
@@ -154,6 +174,9 @@ EreaRpMasterGiveItemFrame:Initialize()
 
 -- Initialize script list presenter
 EreaRpMasterScriptListFrame:Initialize()
+
+-- Initialize NPC panel presenter
+EreaRpMasterNpcPanelFrame:Initialize()
 
 -- Initialize centralized event handler (addon message routing)
 EreaRpMasterEventHandler:Initialize()

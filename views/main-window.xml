@@ -132,58 +132,13 @@
             </Scripts>
           </Button>
 
-          <!-- States tab -->
-          <Button name="$parentTabStates" enableMouse="true">
-            <Size>
-              <AbsDimension x="100" y="28"/>
-            </Size>
-            <Anchors>
-              <Anchor point="LEFT" relativeTo="$parentTabItems" relativePoint="RIGHT">
-                <Offset>
-                  <AbsDimension x="4" y="0"/>
-                </Offset>
-              </Anchor>
-            </Anchors>
-            <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground"
-                      edgeFile="Interface\Tooltips\UI-Tooltip-Border"
-                      tile="true">
-              <EdgeSize>
-                <AbsValue val="12"/>
-              </EdgeSize>
-              <TileSize>
-                <AbsValue val="16"/>
-              </TileSize>
-              <BackgroundInsets>
-                <AbsInset left="3" right="3" top="3" bottom="3"/>
-              </BackgroundInsets>
-            </Backdrop>
-            <Layers>
-              <Layer level="OVERLAY">
-                <FontString name="$parentLabel" inherits="GameFontNormalSmall" text="States">
-                  <Anchors>
-                    <Anchor point="CENTER"/>
-                  </Anchors>
-                </FontString>
-              </Layer>
-            </Layers>
-            <Scripts>
-              <OnLoad>
-                this:SetBackdropColor(0.1, 0.1, 0.1, 1)
-                this:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
-              </OnLoad>
-              <OnClick>
-                EreaRpMaster_SwitchTab("states")
-              </OnClick>
-            </Scripts>
-          </Button>
-
           <!-- Monitor tab -->
           <Button name="$parentTabMonitor" enableMouse="true">
             <Size>
               <AbsDimension x="100" y="28"/>
             </Size>
             <Anchors>
-              <Anchor point="LEFT" relativeTo="$parentTabStates" relativePoint="RIGHT">
+              <Anchor point="LEFT" relativeTo="$parentTabItems" relativePoint="RIGHT">
                 <Offset>
                   <AbsDimension x="4" y="0"/>
                 </Offset>
@@ -222,13 +177,58 @@
             </Scripts>
           </Button>
 
+          <!-- NPCs tab -->
+          <Button name="$parentTabNpcs" enableMouse="true">
+            <Size>
+              <AbsDimension x="100" y="28"/>
+            </Size>
+            <Anchors>
+              <Anchor point="LEFT" relativeTo="$parentTabMonitor" relativePoint="RIGHT">
+                <Offset>
+                  <AbsDimension x="4" y="0"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+            <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground"
+                      edgeFile="Interface\Tooltips\UI-Tooltip-Border"
+                      tile="true">
+              <EdgeSize>
+                <AbsValue val="12"/>
+              </EdgeSize>
+              <TileSize>
+                <AbsValue val="16"/>
+              </TileSize>
+              <BackgroundInsets>
+                <AbsInset left="3" right="3" top="3" bottom="3"/>
+              </BackgroundInsets>
+            </Backdrop>
+            <Layers>
+              <Layer level="OVERLAY">
+                <FontString name="$parentLabel" inherits="GameFontNormalSmall" text="NPCs">
+                  <Anchors>
+                    <Anchor point="CENTER"/>
+                  </Anchors>
+                </FontString>
+              </Layer>
+            </Layers>
+            <Scripts>
+              <OnLoad>
+                this:SetBackdropColor(0.1, 0.1, 0.1, 1)
+                this:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+              </OnLoad>
+              <OnClick>
+                EreaRpMaster_SwitchTab("npcs")
+              </OnClick>
+            </Scripts>
+          </Button>
+
           <!-- Scripts tab -->
           <Button name="$parentTabScripts" enableMouse="true">
             <Size>
               <AbsDimension x="100" y="28"/>
             </Size>
             <Anchors>
-              <Anchor point="LEFT" relativeTo="$parentTabMonitor" relativePoint="RIGHT">
+              <Anchor point="LEFT" relativeTo="$parentTabNpcs" relativePoint="RIGHT">
                 <Offset>
                   <AbsDimension x="4" y="0"/>
                 </Offset>

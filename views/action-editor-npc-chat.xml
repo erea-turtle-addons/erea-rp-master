@@ -1,0 +1,111 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+  <!-- ======================================================================
+       action-editor-npc-chat.xml - NPC Chat Editor Template
+       ======================================================================
+       PURPOSE: Virtual template for the NPC Chat method editor
+       PARAMETERS:
+         - tag: text (required) - NPC tag to match
+         - cmdType: dropdown (required) - say/yell/emote
+         - text: text_with_placeholder (required) - text to speak
+       USAGE: CreateFrame("Frame", name, parent, "EreaRpMasterNpcChatEditorTemplate")
+       ====================================================================== -->
+
+  <Frame name="EreaRpMasterNpcChatEditorTemplate" virtual="true">
+    <Size>
+      <AbsDimension x="360" y="190"/>
+    </Size>
+    <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground"
+              edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+      <EdgeSize><AbsValue val="10"/></EdgeSize>
+      <TileSize><AbsValue val="16"/></TileSize>
+      <BackgroundInsets><AbsInset left="3" right="3" top="3" bottom="3"/></BackgroundInsets>
+    </Backdrop>
+    <Scripts>
+      <OnLoad>
+        this:SetBackdropColor(0.1, 0.1, 0.1, 0.8)
+        this:SetBackdropBorderColor(0.35, 0.35, 0.45, 1)
+      </OnLoad>
+    </Scripts>
+    <Layers>
+      <Layer level="OVERLAY">
+        <!-- Title: y=-7 -->
+        <FontString name="$parentTitle" inherits="GameFontNormal">
+          <Anchors>
+            <Anchor point="TOPLEFT">
+              <Offset><AbsDimension x="7" y="-7"/></Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+        <!-- Tag label: y=-30 -->
+        <FontString name="$parentTagLabel" inherits="GameFontNormalSmall">
+          <Anchors>
+            <Anchor point="TOPLEFT">
+              <Offset><AbsDimension x="10" y="-30"/></Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+        <!-- Chat type label: y=-80 -->
+        <FontString name="$parentCmdTypeLabel" inherits="GameFontNormalSmall">
+          <Anchors>
+            <Anchor point="TOPLEFT">
+              <Offset><AbsDimension x="10" y="-80"/></Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+        <!-- Text label: y=-130 -->
+        <FontString name="$parentTextLabel" inherits="GameFontNormalSmall">
+          <Anchors>
+            <Anchor point="TOPLEFT">
+              <Offset><AbsDimension x="10" y="-130"/></Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+        <!-- Placeholder hint -->
+        <FontString name="$parentTextHint" inherits="GameFontNormalSmall">
+          <Anchors>
+            <Anchor point="TOPLEFT">
+              <Offset><AbsDimension x="10" y="-175"/></Offset>
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <!-- Tag editbox: y=-48 -->
+      <EditBox name="$parentTagEdit" inherits="InputBoxTemplate" autoFocus="false">
+        <Size>
+          <AbsDimension x="340" y="25"/>
+        </Size>
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset><AbsDimension x="10" y="-48"/></Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnEscapePressed>
+            this:ClearFocus()
+          </OnEscapePressed>
+        </Scripts>
+      </EditBox>
+      <!-- Chat type dropdown created in Lua at y=-98 -->
+      <!-- Text editbox: y=-148 -->
+      <EditBox name="$parentTextEdit" inherits="InputBoxTemplate" autoFocus="false">
+        <Size>
+          <AbsDimension x="340" y="25"/>
+        </Size>
+        <Anchors>
+          <Anchor point="TOPLEFT">
+            <Offset><AbsDimension x="10" y="-148"/></Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnEscapePressed>
+            this:ClearFocus()
+          </OnEscapePressed>
+        </Scripts>
+      </EditBox>
+    </Frames>
+  </Frame>
+
+</Ui>

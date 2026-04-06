@@ -52,6 +52,29 @@ local function PlayerHasGmExtension(playerExts, gmExts)
 end
 
 -- ============================================================================
+-- GetPlayerCategory - Returns sort priority and dot color based on player type
+-- ============================================================================
+local CATEGORY_COLORS = {
+    pc      = { r = 0.2, g = 0.8, b = 0.2 },  -- green
+    npc     = { r = 0.3, g = 0.5, b = 1.0 },  -- blue
+    noAddon = { r = 1,   g = 0.6, b = 0   },  -- orange
+    unknown = { r = 0.5, g = 0.5, b = 0.5 },  -- gray
+}
+
+local function GetPlayerCategory(ps)
+    if not ps then
+        return 4, CATEGORY_COLORS.unknown
+    end
+    if not ps.hasAddon then
+        return 3, CATEGORY_COLORS.noAddon
+    end
+    if ps.charType == "NPC" then
+        return 2, CATEGORY_COLORS.npc
+    end
+    return 1, CATEGORY_COLORS.pc
+end
+
+-- ============================================================================
 -- Player state storage (global for cross-module access if needed)
 -- ============================================================================
 EreaRpMaster_PlayerStates = {}
@@ -144,6 +167,15 @@ end
 -- ============================================================================
 function EreaRpMasterPlayerMonitorFrame:RefreshPlayerList()
     local self = EreaRpMasterPlayerMonitorFrame
+    self:RebuildPlayerRows()
+    self:SendStatusRequest()
+end
+
+-- ============================================================================
+-- RebuildPlayerRows - Enumerate group, sort, and rebuild display rows
+-- ============================================================================
+function EreaRpMasterPlayerMonitorFrame:RebuildPlayerRows()
+    local self = EreaRpMasterPlayerMonitorFrame
 
     -- Enumerate group members
     local players = {}
@@ -177,6 +209,14 @@ function EreaRpMasterPlayerMonitorFrame:RefreshPlayerList()
         end
     end
 
+    -- Sort: PCs first (green), then NPCs (blue), then no-addon (orange), then unknown
+    table.sort(players, function(a, b)
+        local catA = GetPlayerCategory(EreaRpMaster_PlayerStates[a])
+        local catB = GetPlayerCategory(EreaRpMaster_PlayerStates[b])
+        if catA ~= catB then return catA < catB end
+        return a < b
+    end)
+
     local playerCount = table.getn(players)  -- Lua 5.0: no # operator
 
     -- Scroll child width: at least ROW_MIN_WIDTH so icons are never clipped
@@ -206,15 +246,16 @@ function EreaRpMasterPlayerMonitorFrame:RefreshPlayerList()
         -- Get player state
         local ps = EreaRpMaster_PlayerStates[playerName]
         local statusText, statusColor = self:GetSyncStatusInfo(ps)
+        local _, catColor = GetPlayerCategory(ps)
 
-        -- Color dot
-        row.colorDot:SetVertexColor(statusColor.r, statusColor.g, statusColor.b)
+        -- Color dot (player type)
+        row.colorDot:SetVertexColor(catColor.r, catColor.g, catColor.b)
 
         -- Player name
         row.nameText:SetText(playerName)
         row.nameText:SetTextColor(1, 1, 1)
 
-        -- Status text
+        -- Status text (sync status)
         row.statusText:SetText(statusText)
         row.statusText:SetTextColor(statusColor.r, statusColor.g, statusColor.b)
 
@@ -295,9 +336,6 @@ function EreaRpMasterPlayerMonitorFrame:RefreshPlayerList()
 
     -- Update status bar
     self.statusText:SetText(playerCount .. " player(s)")
-
-    -- Send status request to group
-    self:SendStatusRequest()
 end
 
 -- ============================================================================
@@ -513,6 +551,9 @@ end
 function EreaRpMasterPlayerMonitorFrame:SendStatusRequest()
     local self = EreaRpMasterPlayerMonitorFrame
 
+    -- Reset NPC online status at cycle start
+    EreaRpMasterNpcLibrary:MarkAllOffline()
+
     local requestId = tostring(GetTime()) .. tostring(math.random(1000, 9999))
 
     self.pendingRequest = {
@@ -632,6 +673,9 @@ function EreaRpMasterPlayerMonitorFrame:HandleStatusResponse(sender, parts)
         end
     end
 
+    -- Character type: "NPC" or "PC" (8th field, optional for backward compat)
+    local charType = parts[8] or "PC"
+
     -- Update player state
     EreaRpMaster_PlayerStates[sender] = {
         version = version,
@@ -642,7 +686,8 @@ function EreaRpMasterPlayerMonitorFrame:HandleStatusResponse(sender, parts)
         zone = zone,
         coordX = coordX,
         coordY = coordY,
-        extensions = extensions
+        extensions = extensions,
+        charType = charType
     }
 
     -- Mark as responded
@@ -680,27 +725,19 @@ function EreaRpMasterPlayerMonitorFrame:HandleRequestTimeout()
                         ps.hasAddon = false
                     end
                 end
-                self:RefreshPlayerRow(row.playerName)
             end
         end
     end
 
     self.pendingRequest = nil
 
-    -- Update status bar with addon count
-    local playerCount = 0
-    local addonCount = 0
-    for i = 1, table.getn(self.rowFrames) do  -- Lua 5.0: no # operator
-        local row = self.rowFrames[i]
-        if row:IsShown() then
-            playerCount = playerCount + 1
-            local ps = EreaRpMaster_PlayerStates[row.playerName]
-            if ps and ps.hasAddon then
-                addonCount = addonCount + 1
-            end
-        end
+    -- Rebuild rows to re-sort by player type now that all responses are in
+    self:RebuildPlayerRows()
+
+    -- Refresh NPC panel if visible
+    if EreaRpMasterNpcPanelFrame:IsShown() then
+        EreaRpMasterNpcPanelFrame:RefreshList()
     end
-    self.statusText:SetText(playerCount .. " player(s), " .. addonCount .. " with addon")
 end
 
 -- ============================================================================
@@ -714,8 +751,9 @@ function EreaRpMasterPlayerMonitorFrame:RefreshPlayerRow(playerName)
         if row:IsShown() and row.playerName == playerName then
             local ps = EreaRpMaster_PlayerStates[playerName]
             local statusText, statusColor = self:GetSyncStatusInfo(ps)
+            local _, catColor = GetPlayerCategory(ps)
 
-            row.colorDot:SetVertexColor(statusColor.r, statusColor.g, statusColor.b)
+            row.colorDot:SetVertexColor(catColor.r, catColor.g, catColor.b)
             row.statusText:SetText(statusText)
             row.statusText:SetTextColor(statusColor.r, statusColor.g, statusColor.b)
 

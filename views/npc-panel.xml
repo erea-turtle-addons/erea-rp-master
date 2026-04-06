@@ -1,0 +1,820 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+  <!-- NPC Panel - content for the NPCs tab -->
+  <!-- Left: NPC list | Right: Quick Line (top) + Script (bottom) -->
+  <Frame name="EreaRpMasterNpcPanelFrame" parent="EreaRpMasterMainWindowContentFrame" hidden="true">
+    <Anchors>
+      <Anchor point="TOPLEFT"/>
+      <Anchor point="BOTTOMRIGHT"/>
+    </Anchors>
+
+    <Frames>
+      <!-- ================================================================ -->
+      <!-- LEFT PANEL: NPC list (200 wide) -->
+      <!-- ================================================================ -->
+      <Frame name="$parentLeftPanel">
+        <Size>
+          <AbsDimension x="200" y="0"/>
+        </Size>
+        <Anchors>
+          <Anchor point="TOPLEFT"/>
+          <Anchor point="BOTTOMLEFT"/>
+        </Anchors>
+        <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground"
+                  edgeFile="Interface\Tooltips\UI-Tooltip-Border"
+                  tile="true">
+          <EdgeSize>
+            <AbsValue val="12"/>
+          </EdgeSize>
+          <TileSize>
+            <AbsValue val="16"/>
+          </TileSize>
+          <BackgroundInsets>
+            <AbsInset left="3" right="3" top="3" bottom="3"/>
+          </BackgroundInsets>
+        </Backdrop>
+        <Scripts>
+          <OnLoad>
+            this:SetBackdropColor(0.05, 0.05, 0.05, 1)
+            this:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+          </OnLoad>
+        </Scripts>
+
+        <Frames>
+          <!-- Scroll frame for NPC name rows -->
+          <ScrollFrame name="EreaRpMasterNpcPanelScrollFrame" inherits="UIPanelScrollFrameTemplate">
+            <Anchors>
+              <Anchor point="TOPLEFT">
+                <Offset>
+                  <AbsDimension x="4" y="-4"/>
+                </Offset>
+              </Anchor>
+              <Anchor point="BOTTOMRIGHT">
+                <Offset>
+                  <AbsDimension x="-26" y="35"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+            <Frames>
+              <Frame name="$parentScrollChild">
+                <Size>
+                  <AbsDimension x="0" y="1"/>
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT"/>
+                  <Anchor point="TOPRIGHT"/>
+                </Anchors>
+              </Frame>
+            </Frames>
+            <Scripts>
+              <OnLoad>
+                this:SetScrollChild(EreaRpMasterNpcPanelScrollFrameScrollChild)
+              </OnLoad>
+            </Scripts>
+          </ScrollFrame>
+
+          <!-- Status text (bottom-left of list panel) -->
+          <FontString name="EreaRpMasterNpcPanelStatusText" inherits="GameFontNormalSmall">
+            <Anchors>
+              <Anchor point="BOTTOMLEFT">
+                <Offset>
+                  <AbsDimension x="8" y="10"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+          </FontString>
+
+          <!-- Refresh button (bottom-right of list panel) -->
+          <Button name="EreaRpMasterNpcPanelRefreshButton" inherits="UIPanelButtonTemplate" text="Refresh">
+            <Size>
+              <AbsDimension x="64" y="22"/>
+            </Size>
+            <Anchors>
+              <Anchor point="BOTTOMRIGHT">
+                <Offset>
+                  <AbsDimension x="-4" y="6"/>
+                </Offset>
+              </Anchor>
+            </Anchors>
+            <Scripts>
+              <OnClick>
+                EreaRpMasterNpcPanelFrame:RefreshNpcStatus()
+              </OnClick>
+            </Scripts>
+          </Button>
+        </Frames>
+      </Frame>
+
+      <!-- ================================================================ -->
+      <!-- RIGHT PANEL -->
+      <!-- ================================================================ -->
+      <Frame name="$parentRightPanel">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentLeftPanel" relativePoint="TOPRIGHT">
+            <Offset>
+              <AbsDimension x="12" y="0"/>
+            </Offset>
+          </Anchor>
+          <Anchor point="BOTTOMRIGHT"/>
+        </Anchors>
+
+        <Frames>
+
+          <!-- ============================================================ -->
+          <!-- TOP ROW: Quick Line + History (left) | Tags (right) -->
+          <!-- ============================================================ -->
+          <Frame name="$parentTopRow">
+            <Size>
+              <AbsDimension x="0" y="208"/>
+            </Size>
+            <Anchors>
+              <Anchor point="TOPLEFT"/>
+              <Anchor point="TOPRIGHT"/>
+            </Anchors>
+
+            <Frames>
+
+              <!-- ============================================================ -->
+              <!-- QUICK LINE SECTION (top-left, fixed height) -->
+              <!-- ============================================================ -->
+              <Frame name="$parentQuickLineSection" enableMouse="false">
+                <Size>
+                  <AbsDimension x="0" y="80"/>
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT"/>
+                  <Anchor point="TOPRIGHT">
+                    <Offset>
+                      <AbsDimension x="-200" y="0"/>
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground"
+                          edgeFile="Interface\Tooltips\UI-Tooltip-Border"
+                          tile="true">
+                  <EdgeSize>
+                    <AbsValue val="12"/>
+                  </EdgeSize>
+                  <TileSize>
+                    <AbsValue val="16"/>
+                  </TileSize>
+                  <BackgroundInsets>
+                    <AbsInset left="3" right="3" top="3" bottom="3"/>
+                  </BackgroundInsets>
+                </Backdrop>
+                <Scripts>
+                  <OnLoad>
+                    this:SetBackdropColor(0.06, 0.06, 0.08, 1)
+                    this:SetBackdropBorderColor(0.5, 0.5, 0.6, 1)
+                  </OnLoad>
+                </Scripts>
+
+                <Layers>
+                  <Layer level="OVERLAY">
+                    <FontString name="$parentHeader" inherits="GameFontNormal" text="Quick Line">
+                      <Color r="1" g="0.82" b="0"/>
+                      <Anchors>
+                        <Anchor point="TOPLEFT">
+                          <Offset>
+                            <AbsDimension x="10" y="-8"/>
+                          </Offset>
+                        </Anchor>
+                      </Anchors>
+                    </FontString>
+                    <Texture name="$parentSeparator">
+                      <Size>
+                        <AbsDimension x="0" y="1"/>
+                      </Size>
+                      <Anchors>
+                        <Anchor point="TOPLEFT">
+                          <Offset>
+                            <AbsDimension x="8" y="-24"/>
+                          </Offset>
+                        </Anchor>
+                        <Anchor point="TOPRIGHT">
+                          <Offset>
+                            <AbsDimension x="-8" y="-24"/>
+                          </Offset>
+                        </Anchor>
+                      </Anchors>
+                      <Color r="0.4" g="0.4" b="0.5" a="0.6"/>
+                    </Texture>
+                  </Layer>
+                </Layers>
+
+                <Frames>
+                  <!-- Text input -->
+                  <EditBox name="EreaRpMasterNpcPanelQuickLineInput" autoFocus="false">
+                    <Size>
+                      <AbsDimension x="0" y="22"/>
+                    </Size>
+                    <Anchors>
+                      <Anchor point="TOPLEFT">
+                        <Offset>
+                          <AbsDimension x="8" y="-30"/>
+                        </Offset>
+                      </Anchor>
+                      <Anchor point="TOPRIGHT">
+                        <Offset>
+                          <AbsDimension x="-8" y="-30"/>
+                        </Offset>
+                      </Anchor>
+                    </Anchors>
+                    <Layers>
+                      <Layer level="BACKGROUND">
+                        <FontString inherits="ChatFontNormal" setAllPoints="true"/>
+                      </Layer>
+                    </Layers>
+                    <FontString inherits="ChatFontNormal"/>
+                    <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground"
+                              edgeFile="Interface\Tooltips\UI-Tooltip-Border"
+                              tile="true">
+                      <EdgeSize>
+                        <AbsValue val="10"/>
+                      </EdgeSize>
+                      <TileSize>
+                        <AbsValue val="16"/>
+                      </TileSize>
+                      <BackgroundInsets>
+                        <AbsInset left="3" right="3" top="3" bottom="3"/>
+                      </BackgroundInsets>
+                    </Backdrop>
+                    <Scripts>
+                      <OnLoad>
+                        this:SetBackdropColor(0.1, 0.1, 0.1, 1)
+                        this:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+                        this:SetTextInsets(5, 5, 0, 0)
+                        this:SetMaxLetters(255)
+                      </OnLoad>
+                      <OnEscapePressed>
+                        this:ClearFocus()
+                      </OnEscapePressed>
+                      <OnEnterPressed>
+                        EreaRpMasterNpcPanelFrame:SendQuickLine("say")
+                      </OnEnterPressed>
+                    </Scripts>
+                  </EditBox>
+
+                  <!-- Say button -->
+                  <Button name="EreaRpMasterNpcPanelSayButton" inherits="UIPanelButtonTemplate" text="Say">
+                    <Size>
+                      <AbsDimension x="64" y="22"/>
+                    </Size>
+                    <Anchors>
+                      <Anchor point="BOTTOMLEFT">
+                        <Offset>
+                          <AbsDimension x="8" y="6"/>
+                        </Offset>
+                      </Anchor>
+                    </Anchors>
+                    <Scripts>
+                      <OnClick>
+                        EreaRpMasterNpcPanelFrame:SendQuickLine("say")
+                      </OnClick>
+                    </Scripts>
+                  </Button>
+
+                  <!-- Yell button -->
+                  <Button name="EreaRpMasterNpcPanelYellButton" inherits="UIPanelButtonTemplate" text="Yell">
+                    <Size>
+                      <AbsDimension x="64" y="22"/>
+                    </Size>
+                    <Anchors>
+                      <Anchor point="BOTTOMLEFT" relativeTo="EreaRpMasterNpcPanelSayButton" relativePoint="BOTTOMRIGHT">
+                        <Offset>
+                          <AbsDimension x="4" y="0"/>
+                        </Offset>
+                      </Anchor>
+                    </Anchors>
+                    <Scripts>
+                      <OnClick>
+                        EreaRpMasterNpcPanelFrame:SendQuickLine("yell")
+                      </OnClick>
+                    </Scripts>
+                  </Button>
+
+                  <!-- Emote button -->
+                  <Button name="EreaRpMasterNpcPanelEmoteButton" inherits="UIPanelButtonTemplate" text="Emote">
+                    <Size>
+                      <AbsDimension x="64" y="22"/>
+                    </Size>
+                    <Anchors>
+                      <Anchor point="BOTTOMLEFT" relativeTo="EreaRpMasterNpcPanelYellButton" relativePoint="BOTTOMRIGHT">
+                        <Offset>
+                          <AbsDimension x="4" y="0"/>
+                        </Offset>
+                      </Anchor>
+                    </Anchors>
+                    <Scripts>
+                      <OnClick>
+                        EreaRpMasterNpcPanelFrame:SendQuickLine("emote")
+                      </OnClick>
+                    </Scripts>
+                  </Button>
+                </Frames>
+              </Frame>
+
+              <!-- ============================================================ -->
+              <!-- HISTORY SECTION (below Quick Line, left sub-column) -->
+              <!-- ============================================================ -->
+              <Frame name="$parentHistorySection" enableMouse="false">
+                <Size>
+                  <AbsDimension x="0" y="120"/>
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPLEFT" relativeTo="$parentQuickLineSection" relativePoint="BOTTOMLEFT">
+                    <Offset>
+                      <AbsDimension x="0" y="-8"/>
+                    </Offset>
+                  </Anchor>
+                  <Anchor point="TOPRIGHT" relativeTo="$parentQuickLineSection" relativePoint="BOTTOMRIGHT">
+                    <Offset>
+                      <AbsDimension x="0" y="-8"/>
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground"
+                          edgeFile="Interface\Tooltips\UI-Tooltip-Border"
+                          tile="true">
+                  <EdgeSize>
+                    <AbsValue val="12"/>
+                  </EdgeSize>
+                  <TileSize>
+                    <AbsValue val="16"/>
+                  </TileSize>
+                  <BackgroundInsets>
+                    <AbsInset left="3" right="3" top="3" bottom="3"/>
+                  </BackgroundInsets>
+                </Backdrop>
+                <Scripts>
+                  <OnLoad>
+                    this:SetBackdropColor(0.04, 0.05, 0.06, 1)
+                    this:SetBackdropBorderColor(0.45, 0.5, 0.55, 1)
+                  </OnLoad>
+                </Scripts>
+
+                <Layers>
+                  <Layer level="OVERLAY">
+                    <FontString name="$parentHeader" inherits="GameFontNormal" text="History">
+                      <Color r="1" g="0.82" b="0"/>
+                      <Anchors>
+                        <Anchor point="TOPLEFT">
+                          <Offset>
+                            <AbsDimension x="10" y="-8"/>
+                          </Offset>
+                        </Anchor>
+                      </Anchors>
+                    </FontString>
+                    <Texture name="$parentSeparator">
+                      <Size>
+                        <AbsDimension x="0" y="1"/>
+                      </Size>
+                      <Anchors>
+                        <Anchor point="TOPLEFT">
+                          <Offset>
+                            <AbsDimension x="8" y="-24"/>
+                          </Offset>
+                        </Anchor>
+                        <Anchor point="TOPRIGHT">
+                          <Offset>
+                            <AbsDimension x="-8" y="-24"/>
+                          </Offset>
+                        </Anchor>
+                      </Anchors>
+                      <Color r="0.4" g="0.4" b="0.5" a="0.6"/>
+                    </Texture>
+                  </Layer>
+                </Layers>
+
+                <Frames>
+                  <ScrollingMessageFrame name="EreaRpMasterNpcHistoryFrame">
+                    <Anchors>
+                      <Anchor point="TOPLEFT">
+                        <Offset>
+                          <AbsDimension x="8" y="-28"/>
+                        </Offset>
+                      </Anchor>
+                      <Anchor point="BOTTOMRIGHT">
+                        <Offset>
+                          <AbsDimension x="-8" y="6"/>
+                        </Offset>
+                      </Anchor>
+                    </Anchors>
+                    <FontString inherits="GameFontNormalSmall"/>
+                    <Scripts>
+                      <OnLoad>
+                        this:SetFading(false)
+                        this:SetMaxLines(200)
+                        this:SetJustifyH("LEFT")
+                      </OnLoad>
+                    </Scripts>
+                  </ScrollingMessageFrame>
+                </Frames>
+              </Frame>
+
+              <!-- ============================================================ -->
+              <!-- TAGS SECTION (right sub-column, full height of TopRow) -->
+              <!-- ============================================================ -->
+              <Frame name="$parentTagsSection">
+                <Size>
+                  <AbsDimension x="192" y="0"/>
+                </Size>
+                <Anchors>
+                  <Anchor point="TOPRIGHT"/>
+                  <Anchor point="BOTTOMRIGHT"/>
+                </Anchors>
+                <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground"
+                          edgeFile="Interface\Tooltips\UI-Tooltip-Border"
+                          tile="true">
+                  <EdgeSize>
+                    <AbsValue val="12"/>
+                  </EdgeSize>
+                  <TileSize>
+                    <AbsValue val="16"/>
+                  </TileSize>
+                  <BackgroundInsets>
+                    <AbsInset left="3" right="3" top="3" bottom="3"/>
+                  </BackgroundInsets>
+                </Backdrop>
+                <Scripts>
+                  <OnLoad>
+                    this:SetBackdropColor(0.04, 0.05, 0.06, 1)
+                    this:SetBackdropBorderColor(0.45, 0.5, 0.55, 1)
+                  </OnLoad>
+                </Scripts>
+
+                <Layers>
+                  <Layer level="OVERLAY">
+                    <FontString name="$parentHeader" inherits="GameFontNormal" text="Tags">
+                      <Color r="1" g="0.82" b="0"/>
+                      <Anchors>
+                        <Anchor point="TOPLEFT">
+                          <Offset>
+                            <AbsDimension x="10" y="-8"/>
+                          </Offset>
+                        </Anchor>
+                      </Anchors>
+                    </FontString>
+                    <Texture name="$parentSeparator">
+                      <Size>
+                        <AbsDimension x="0" y="1"/>
+                      </Size>
+                      <Anchors>
+                        <Anchor point="TOPLEFT">
+                          <Offset>
+                            <AbsDimension x="8" y="-24"/>
+                          </Offset>
+                        </Anchor>
+                        <Anchor point="TOPRIGHT">
+                          <Offset>
+                            <AbsDimension x="-8" y="-24"/>
+                          </Offset>
+                        </Anchor>
+                      </Anchors>
+                      <Color r="0.4" g="0.4" b="0.5" a="0.6"/>
+                    </Texture>
+                  </Layer>
+                </Layers>
+
+                <Frames>
+                  <!-- Tag pills container (dynamically populated by Lua) -->
+                  <Frame name="EreaRpMasterNpcTagPillContainer">
+                    <Anchors>
+                      <Anchor point="TOPLEFT">
+                        <Offset>
+                          <AbsDimension x="6" y="-28"/>
+                        </Offset>
+                      </Anchor>
+                      <Anchor point="TOPRIGHT">
+                        <Offset>
+                          <AbsDimension x="-6" y="-28"/>
+                        </Offset>
+                      </Anchor>
+                      <Anchor point="BOTTOM">
+                        <Offset>
+                          <AbsDimension x="0" y="60"/>
+                        </Offset>
+                      </Anchor>
+                    </Anchors>
+                  </Frame>
+
+                  <!-- Tag dropdown (select existing tag) -->
+                  <Frame name="EreaRpMasterNpcTagDropdown" inherits="UIDropDownMenuTemplate">
+                    <Anchors>
+                      <Anchor point="BOTTOMLEFT">
+                        <Offset>
+                          <AbsDimension x="-12" y="24"/>
+                        </Offset>
+                      </Anchor>
+                    </Anchors>
+                  </Frame>
+
+                  <!-- Tag text input (new tag name) -->
+                  <EditBox name="EreaRpMasterNpcTagInput" autoFocus="false">
+                    <Size>
+                      <AbsDimension x="0" y="22"/>
+                    </Size>
+                    <Anchors>
+                      <Anchor point="BOTTOMLEFT">
+                        <Offset>
+                          <AbsDimension x="8" y="4"/>
+                        </Offset>
+                      </Anchor>
+                      <Anchor point="BOTTOMRIGHT">
+                        <Offset>
+                          <AbsDimension x="-52" y="4"/>
+                        </Offset>
+                      </Anchor>
+                    </Anchors>
+                    <FontString inherits="ChatFontNormal"/>
+                    <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground"
+                              edgeFile="Interface\Tooltips\UI-Tooltip-Border"
+                              tile="true">
+                      <EdgeSize>
+                        <AbsValue val="8"/>
+                      </EdgeSize>
+                      <TileSize>
+                        <AbsValue val="16"/>
+                      </TileSize>
+                      <BackgroundInsets>
+                        <AbsInset left="2" right="2" top="2" bottom="2"/>
+                      </BackgroundInsets>
+                    </Backdrop>
+                    <Scripts>
+                      <OnLoad>
+                        this:SetBackdropColor(0.08, 0.08, 0.1, 1)
+                        this:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+                        this:SetTextInsets(4, 4, 0, 0)
+                        this:SetMaxLetters(30)
+                      </OnLoad>
+                      <OnEscapePressed>
+                        this:ClearFocus()
+                      </OnEscapePressed>
+                      <OnEnterPressed>
+                        EreaRpMasterNpcPanelFrame:AddTagFromInput()
+                        this:ClearFocus()
+                      </OnEnterPressed>
+                    </Scripts>
+                  </EditBox>
+
+                  <!-- Add tag button -->
+                  <Button name="EreaRpMasterNpcTagAddButton" inherits="UIPanelButtonTemplate" text="Add">
+                    <Size>
+                      <AbsDimension x="44" y="22"/>
+                    </Size>
+                    <Anchors>
+                      <Anchor point="BOTTOMRIGHT">
+                        <Offset>
+                          <AbsDimension x="-6" y="4"/>
+                        </Offset>
+                      </Anchor>
+                    </Anchors>
+                    <Scripts>
+                      <OnClick>
+                        EreaRpMasterNpcPanelFrame:AddTagFromInput()
+                      </OnClick>
+                    </Scripts>
+                  </Button>
+                </Frames>
+              </Frame>
+
+            </Frames>
+          </Frame>
+
+          <!-- ============================================================ -->
+          <!-- EVENT SCRIPT SECTION (fills remaining height below TopRow) -->
+          <!-- ============================================================ -->
+          <Frame name="$parentEventSection" enableMouse="false">
+            <Anchors>
+              <Anchor point="TOPLEFT" relativeTo="$parentTopRow" relativePoint="BOTTOMLEFT">
+                <Offset>
+                  <AbsDimension x="0" y="-8"/>
+                </Offset>
+              </Anchor>
+              <Anchor point="BOTTOMRIGHT"/>
+            </Anchors>
+            <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground"
+                      edgeFile="Interface\Tooltips\UI-Tooltip-Border"
+                      tile="true">
+              <EdgeSize>
+                <AbsValue val="12"/>
+              </EdgeSize>
+              <TileSize>
+                <AbsValue val="16"/>
+              </TileSize>
+              <BackgroundInsets>
+                <AbsInset left="3" right="3" top="3" bottom="3"/>
+              </BackgroundInsets>
+            </Backdrop>
+            <Scripts>
+              <OnLoad>
+                this:SetBackdropColor(0.04, 0.05, 0.06, 1)
+                this:SetBackdropBorderColor(0.45, 0.5, 0.55, 1)
+              </OnLoad>
+            </Scripts>
+
+            <Layers>
+              <Layer level="OVERLAY">
+                <FontString name="$parentHeader" inherits="GameFontNormal" text="Event Script">
+                  <Color r="1" g="0.82" b="0"/>
+                  <Anchors>
+                    <Anchor point="TOPLEFT">
+                      <Offset>
+                        <AbsDimension x="10" y="-8"/>
+                      </Offset>
+                    </Anchor>
+                  </Anchors>
+                </FontString>
+                <Texture name="$parentSeparator">
+                  <Size>
+                    <AbsDimension x="0" y="1"/>
+                  </Size>
+                  <Anchors>
+                    <Anchor point="TOPLEFT">
+                      <Offset>
+                        <AbsDimension x="8" y="-24"/>
+                      </Offset>
+                    </Anchor>
+                    <Anchor point="TOPRIGHT">
+                      <Offset>
+                        <AbsDimension x="-8" y="-24"/>
+                      </Offset>
+                    </Anchor>
+                  </Anchors>
+                  <Color r="0.4" g="0.4" b="0.5" a="0.6"/>
+                </Texture>
+              </Layer>
+            </Layers>
+
+            <Frames>
+              <!-- Event dropdown (includes New Event entry) -->
+              <Frame name="EreaRpMasterNpcEventDropdown" inherits="UIDropDownMenuTemplate">
+                <Anchors>
+                  <Anchor point="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="-10" y="-28"/>
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+              </Frame>
+
+              <!-- Event name editbox (between dropdown and buttons) -->
+              <EditBox name="EreaRpMasterNpcEventNameInput" autoFocus="false">
+                <Size>
+                  <AbsDimension x="120" y="22"/>
+                </Size>
+                <Anchors>
+                  <Anchor point="LEFT" relativeTo="EreaRpMasterNpcEventDropdown" relativePoint="RIGHT">
+                    <Offset>
+                      <AbsDimension x="-14" y="2"/>
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <FontString inherits="ChatFontNormal"/>
+                <Backdrop bgFile="Interface\ChatFrame\ChatFrameBackground"
+                          edgeFile="Interface\Tooltips\UI-Tooltip-Border"
+                          tile="true">
+                  <EdgeSize>
+                    <AbsValue val="8"/>
+                  </EdgeSize>
+                  <TileSize>
+                    <AbsValue val="16"/>
+                  </TileSize>
+                  <BackgroundInsets>
+                    <AbsInset left="2" right="2" top="2" bottom="2"/>
+                  </BackgroundInsets>
+                </Backdrop>
+                <Scripts>
+                  <OnLoad>
+                    this:SetBackdropColor(0.08, 0.08, 0.1, 1)
+                    this:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+                    this:SetTextInsets(4, 4, 0, 0)
+                    this:SetMaxLetters(50)
+                  </OnLoad>
+                  <OnTextChanged>
+                    EreaRpMasterNpcPanelFrame:OnEventNameChanged()
+                  </OnTextChanged>
+                  <OnEscapePressed>
+                    this:ClearFocus()
+                  </OnEscapePressed>
+                  <OnEnterPressed>
+                    this:ClearFocus()
+                  </OnEnterPressed>
+                </Scripts>
+              </EditBox>
+
+              <!-- Save Event button -->
+              <Button name="EreaRpMasterNpcEventSaveButton" inherits="UIPanelButtonTemplate" text="Save">
+                <Size>
+                  <AbsDimension x="54" y="22"/>
+                </Size>
+                <Anchors>
+                  <Anchor point="LEFT" relativeTo="EreaRpMasterNpcEventNameInput" relativePoint="RIGHT">
+                    <Offset>
+                      <AbsDimension x="4" y="0"/>
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Scripts>
+                  <OnClick>
+                    EreaRpMasterNpcPanelFrame:SaveActiveEvent()
+                  </OnClick>
+                </Scripts>
+              </Button>
+
+              <!-- Delete Event button -->
+              <Button name="EreaRpMasterNpcEventDeleteButton" inherits="UIPanelButtonTemplate" text="Delete">
+                <Size>
+                  <AbsDimension x="54" y="22"/>
+                </Size>
+                <Anchors>
+                  <Anchor point="LEFT" relativeTo="EreaRpMasterNpcEventSaveButton" relativePoint="RIGHT">
+                    <Offset>
+                      <AbsDimension x="4" y="0"/>
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Scripts>
+                  <OnClick>
+                    EreaRpMasterNpcPanelFrame:DeleteActiveEvent()
+                  </OnClick>
+                </Scripts>
+              </Button>
+
+              <!-- Scrollable cue line table -->
+              <ScrollFrame name="EreaRpMasterNpcEventScroll" inherits="UIPanelScrollFrameTemplate">
+                <Anchors>
+                  <Anchor point="TOPLEFT">
+                    <Offset>
+                      <AbsDimension x="4" y="-61"/>
+                    </Offset>
+                  </Anchor>
+                  <Anchor point="BOTTOMRIGHT">
+                    <Offset>
+                      <AbsDimension x="-27" y="34"/>
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Frames>
+                  <Frame name="$parentScrollChild">
+                    <Size>
+                      <AbsDimension x="1" y="1"/>
+                    </Size>
+                    <Anchors>
+                      <Anchor point="TOPLEFT"/>
+                    </Anchors>
+                  </Frame>
+                </Frames>
+                <Scripts>
+                  <OnLoad>
+                    this:SetScrollChild(EreaRpMasterNpcEventScrollScrollChild)
+                  </OnLoad>
+                </Scripts>
+              </ScrollFrame>
+
+              <!-- Add Row button -->
+              <Button name="EreaRpMasterNpcEventAddRowButton" inherits="UIPanelButtonTemplate" text="Add Line">
+                <Size>
+                  <AbsDimension x="80" y="22"/>
+                </Size>
+                <Anchors>
+                  <Anchor point="BOTTOMLEFT">
+                    <Offset>
+                      <AbsDimension x="8" y="6"/>
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Scripts>
+                  <OnClick>
+                    EreaRpMasterNpcPanelFrame:AddEventLine()
+                  </OnClick>
+                </Scripts>
+              </Button>
+
+              <!-- Remove Row button -->
+              <Button name="EreaRpMasterNpcEventRemoveRowButton" inherits="UIPanelButtonTemplate" text="Remove">
+                <Size>
+                  <AbsDimension x="70" y="22"/>
+                </Size>
+                <Anchors>
+                  <Anchor point="BOTTOMLEFT" relativeTo="EreaRpMasterNpcEventAddRowButton" relativePoint="BOTTOMRIGHT">
+                    <Offset>
+                      <AbsDimension x="4" y="0"/>
+                    </Offset>
+                  </Anchor>
+                </Anchors>
+                <Scripts>
+                  <OnClick>
+                    EreaRpMasterNpcPanelFrame:RemoveEventLine()
+                  </OnClick>
+                </Scripts>
+              </Button>
+            </Frames>
+          </Frame>
+
+        </Frames>
+      </Frame>
+    </Frames>
+  </Frame>
+
+</Ui>

@@ -117,16 +117,16 @@ function EreaRpMaster_SwitchTab(tabName)
     -- Content frame names by tab (convention -- defined in future task XMLs)
     local frames = {
         items   = "EreaRpMasterItemListFrame",
-        states  = "EreaRpMasterClueListFrame",
         monitor = "EreaRpMasterPlayerMonitorFrame",
-        scripts = "EreaRpMasterScriptListFrame"
+        scripts = "EreaRpMasterScriptListFrame",
+        npcs    = "EreaRpMasterNpcPanelFrame"
     }
     -- Tab button names (defined in main-window.xml)
     local buttons = {
         items   = "EreaRpMasterMainWindowTabBarTabItems",
-        states  = "EreaRpMasterMainWindowTabBarTabStates",
         monitor = "EreaRpMasterMainWindowTabBarTabMonitor",
-        scripts = "EreaRpMasterMainWindowTabBarTabScripts"
+        scripts = "EreaRpMasterMainWindowTabBarTabScripts",
+        npcs    = "EreaRpMasterMainWindowTabBarTabNpcs"
     }
 
     -- Show/hide content frames
